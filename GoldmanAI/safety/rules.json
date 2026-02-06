@@ -1,0 +1,24 @@
+{
+  "blocked_terms": [
+    "graphic violence",
+    "self-harm",
+    "sexual content",
+    "child exploitation",
+    "hate propaganda",
+    "extremist recruitment",
+    "illegal weapon tutorial",
+    "drug manufacturing"
+  ],
+  "education_mode_extra_blocks": [
+    "horror gore",
+    "gambling promotion",
+    "adult nightclub",
+    "alcohol abuse"
+  ],
+  "restricted_visual_themes": [
+    "realistic bloodshed",
+    "explicit nudity",
+    "torture scene",
+    "suicide depiction"
+  ]
+}
