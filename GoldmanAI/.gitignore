@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+assets/output/*.mp4
+assets/output/*.wav

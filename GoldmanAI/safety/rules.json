@@ -1,0 +1,20 @@
+{
+  "blocked_terms": [
+    "gore",
+    "blood",
+    "murder",
+    "weapon",
+    "bomb",
+    "drugs",
+    "porn",
+    "explicit",
+    "suicide",
+    "self-harm"
+  ],
+  "safe_replacement": "a safe, family-friendly cinematic scene",
+  "restricted_visual_themes": [
+    "graphic violence",
+    "illegal activity",
+    "sexual explicit content"
+  ]
+}

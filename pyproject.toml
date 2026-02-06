@@ -1,0 +1,17 @@
+[project]
+name = "goldman-ai"
+version = "1.0.0"
+description = "Goldman Ai v1.0 video generation pipeline (text-to-video, image-to-video, frame-by-frame, and multilingual audio)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Goldman Ai" }]
+
+[project.urls]
+Homepage = "https://example.com/goldman-ai"
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
