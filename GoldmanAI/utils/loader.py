@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from utils.config import AppConfig, DEFAULT_CONFIG
+from .config import AppConfig, DEFAULT_CONFIG
 
 
 def prepare_environment(config: AppConfig | None = None) -> AppConfig:
