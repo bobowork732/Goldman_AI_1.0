@@ -133,13 +133,16 @@ class GoldmanWebHandler(BaseHTTPRequestHandler):
         lip_sync_focus = bool(data.get("lip_sync_focus", False))
         if lip_sync_focus and not lip_sync_enabled:
             lip_sync_enabled = True
-        duration_seconds = int(data.get("duration_seconds", 10))
+        raw_duration = data.get("duration_seconds", 10)
+        try:
+            duration_seconds = int(raw_duration)
+        except (TypeError, ValueError):
+            self.send_json({"error": "Duration must be an integer value."}, HTTPStatus.BAD_REQUEST)
+            return
 
         if duration_seconds not in ALLOWED_DURATIONS:
             self.send_json({"error": "Duration must be one of: 6, 10, 15, 20 seconds."}, HTTPStatus.BAD_REQUEST)
             return
-
-        self.pipeline.config.safety.parental_education_mode = parental_mode
 
         if not prompt:
             self.send_json({"error": "Prompt is required."}, HTTPStatus.BAD_REQUEST)
@@ -154,6 +157,7 @@ class GoldmanWebHandler(BaseHTTPRequestHandler):
                 multi_shot_enabled=multi_shot_enabled,
                 lip_sync_enabled=lip_sync_enabled,
                 lip_sync_focus=lip_sync_focus,
+                parental_education_mode=parental_mode,
             )
         except SafeGenerationError as exc:
             self.send_json({"error": str(exc), "blocked": True}, HTTPStatus.FORBIDDEN)

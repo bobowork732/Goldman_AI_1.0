@@ -52,9 +52,15 @@ class GoldmanPipeline:
         multi_shot_enabled: bool = False,
         lip_sync_enabled: bool = False,
         lip_sync_focus: bool = False,
+        parental_education_mode: bool | None = None,
     ) -> GenerationResult:
         """Validate prompt then run text-to-video or image-to-video generation."""
         chosen_duration = duration_seconds if duration_seconds is not None else self.config.render.duration_seconds
+        chosen_parental_mode = (
+            parental_education_mode
+            if parental_education_mode is not None
+            else self.config.safety.parental_education_mode
+        )
         return self.safety_filter.safe_generate(
             prompt,
             self.generator.generate,
@@ -68,5 +74,5 @@ class GoldmanPipeline:
             multi_shot_enabled=multi_shot_enabled,
             lip_sync_enabled=lip_sync_enabled,
             lip_sync_focus=lip_sync_focus,
-            parental_education_mode=self.config.safety.parental_education_mode,
+            parental_education_mode=chosen_parental_mode,
         )
