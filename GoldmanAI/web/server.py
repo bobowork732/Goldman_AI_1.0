@@ -19,6 +19,35 @@ STATIC_DIR = BASE_DIR / "static"
 ALLOWED_DURATIONS = {6, 10, 15, 20}
 
 
+def _coerce_bool(value: Any, default: bool) -> bool:
+    """Coerce common JSON-ish values to bool, falling back to default."""
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"1", "true", "yes", "on"}:
+            return True
+        if normalized in {"0", "false", "no", "off"}:
+            return False
+    return bool(value)
+
+
+def _parse_duration_seconds(value: Any) -> int:
+    """Parse duration safely, rejecting booleans and non-integral values."""
+    if isinstance(value, bool):
+        raise ValueError("Duration must be an integer value.")
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("Duration must be an integer value.")
+        return int(stripped)
+    raise ValueError("Duration must be an integer value.")
+
+
 class GoldmanWebHandler(BaseHTTPRequestHandler):
     """Serves frontend pages and JSON generation endpoint."""
 
@@ -126,16 +155,16 @@ class GoldmanWebHandler(BaseHTTPRequestHandler):
 
         prompt = str(data.get("prompt", "")).strip()
         source_image = str(data.get("source_image", "")).strip() or None
-        parental_mode = bool(data.get("parental_education_mode", True))
-        audio_enabled = bool(data.get("audio_enabled", True))
-        multi_shot_enabled = bool(data.get("multi_shot_enabled", False))
-        lip_sync_enabled = bool(data.get("lip_sync_enabled", False))
-        lip_sync_focus = bool(data.get("lip_sync_focus", False))
+        parental_mode = _coerce_bool(data.get("parental_education_mode"), default=True)
+        audio_enabled = _coerce_bool(data.get("audio_enabled"), default=True)
+        multi_shot_enabled = _coerce_bool(data.get("multi_shot_enabled"), default=False)
+        lip_sync_enabled = _coerce_bool(data.get("lip_sync_enabled"), default=False)
+        lip_sync_focus = _coerce_bool(data.get("lip_sync_focus"), default=False)
         if lip_sync_focus and not lip_sync_enabled:
             lip_sync_enabled = True
         raw_duration = data.get("duration_seconds", 10)
         try:
-            duration_seconds = int(raw_duration)
+            duration_seconds = _parse_duration_seconds(raw_duration)
         except (TypeError, ValueError):
             self.send_json({"error": "Duration must be an integer value."}, HTTPStatus.BAD_REQUEST)
             return
