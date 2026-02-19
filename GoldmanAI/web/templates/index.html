@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Goldman AI Web Studio</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <h1>Goldman AI Web Studio</h1>
+      <p>Create safe AI videos with synchronized audio from your browser.</p>
+      <p>Supports animated image AI (image-to-video), mixed video+audio package export, and multi-shot controls.</p>
+      <nav>
+        <a href="/">Studio</a>
+        <a href="/terms">Terms of Service</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <h2>Generate Video</h2>
+        <label for="prompt">Prompt</label>
+        <textarea id="prompt" rows="4" placeholder="A cinematic sunrise over mountains with slow pan"></textarea>
+
+        <label for="sourceImage">Optional Source Image Path (for animated image AI)</label>
+        <input id="sourceImage" type="text" placeholder="/path/to/reference.png" />
+
+        <label for="duration">Duration</label>
+        <select id="duration">
+          <option value="6">6s</option>
+          <option value="10" selected>10s</option>
+          <option value="15">15s</option>
+          <option value="20">20s</option>
+        </select>
+
+        <label class="checkbox">
+          <input id="audioSwitch" type="checkbox" checked />
+          Audio switch (on = hear sound/talk, off = video only)
+        </label>
+
+        <label class="checkbox">
+          <input id="multiShotSwitch" type="checkbox" />
+          Multi shot switch (on = multiple shots, off = single shot)
+        </label>
+
+
+        <label class="checkbox">
+          <input id="lipSyncSwitch" type="checkbox" />
+          Lip-sync switch (on = sync mouth with audio/speech)
+        </label>
+
+        <label class="checkbox">
+          <input id="lipSyncFocusSwitch" type="checkbox" />
+          Focus lip-sync (on = prioritize mouth-region sync)
+        </label>
+        <label class="checkbox">
+          <input id="parentalMode" type="checkbox" checked />
+          Enable parental/education safety mode
+        </label>
+
+        <button id="generateBtn">Generate</button>
+      </section>
+
+      <section class="card">
+        <h2>Preview & Download</h2>
+        <video id="videoPreview" controls playsinline class="media-preview"></video>
+        <audio id="audioPreview" controls class="media-preview"></audio>
+        <div class="download-row">
+          <a id="downloadVideo" class="download-link" href="#" download>Download Video</a>
+          <a id="downloadAudio" class="download-link" href="#" download>Download Audio</a>
+          <a id="downloadMix" class="download-link" href="#" download>Download Mix Package</a>
+        </div>
+        <p id="previewHint" class="hint">Generate content to preview and download files.</p>
+        <pre id="result">No generation yet.</pre>
+      </section>
+    </main>
+
+    <footer>
+      <small>Inspired by modern AI video workflows (Kling, Sora, Grok Video, Wan, Pika, Veo).</small>
+    </footer>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

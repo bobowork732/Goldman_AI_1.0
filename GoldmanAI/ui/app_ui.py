@@ -5,9 +5,9 @@ from __future__ import annotations
 import tkinter as tk
 from tkinter import messagebox
 
-from engine.pipeline import GoldmanPipeline
-from safety.filter import SafeGenerationError
-from ui.controls import UISettings
+from ..engine.pipeline import GoldmanPipeline
+from ..safety.filter import SafeGenerationError
+from .controls import UISettings
 
 
 class GoldmanAppUI:

@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Any
 
-from safety.moderation import SafetyModerator
+from .moderation import SafetyModerator
 
 
 class SafeGenerationError(RuntimeError):
