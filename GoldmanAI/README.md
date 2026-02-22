@@ -2,9 +2,10 @@
 
 Goldman AI is a modular Python application that demonstrates a **safe AI video model builder (v1.0)** with:
 
-- Text-to-video generation
+- Text-to-video generation with post-process flow: blur -> sharp -> result
 - Image-to-video animation flow
 - Native synchronized audio generation (TTS + sound + mixed export) with waveform validation during mix
+- Video/audio mux export that combines generated video and mixed audio
 - Prompt understanding parser
 - Safety filtering with blocked prompt logging
 
@@ -40,6 +41,7 @@ Each generation now exports versioned files:
 - `generated_tts_v1.wav`
 - `generated_sound_v1.wav`
 - `generated_audio_v1.wav` (mix of TTS + sound)
+- `generated_video_with_audio_v1.mp4` (video + mixed audio result)
 
 ## Example Prompts
 
