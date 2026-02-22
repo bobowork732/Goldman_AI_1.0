@@ -1,10 +1,10 @@
 # Goldman AI 1.0 (Safe Mode)
 
-Goldman AI is a modular Python application that demonstrates a **safe AI video model builder** with:
+Goldman AI is a modular Python application that demonstrates a **safe AI video model builder (v1.0)** with:
 
 - Text-to-video generation
 - Image-to-video animation flow
-- Native synchronized audio generation
+- Native synchronized audio generation (TTS + sound + mixed export)
 - Prompt understanding parser
 - Safety filtering with blocked prompt logging
 
@@ -32,6 +32,15 @@ python main.py
 - `safety/`: moderation rules and filtering logic
 - `utils/`: app configuration and environment bootstrap
 
+## Output Files (v1)
+
+Each generation now exports versioned files:
+
+- `generated_video_v1.mp4`
+- `generated_tts_v1.wav`
+- `generated_sound_v1.wav`
+- `generated_audio_v1.wav` (mix of TTS + sound)
+
 ## Example Prompts
 
 - `A cinematic sunrise over mountains with slow pan, realistic style, wide camera`
@@ -41,4 +50,4 @@ python main.py
 ## Notes
 
 - MP4 export is represented as a dependency-free pseudo MP4 text payload for portability in minimal environments.
-- WAV export is generated as a valid silent audio track synchronized to configured duration.
+- WAV exports are generated as valid synchronized audio tracks in a dependency-free waveform pipeline.

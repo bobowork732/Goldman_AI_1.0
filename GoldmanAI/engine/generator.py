@@ -16,6 +16,8 @@ from engine.scheduler import FrameScheduler
 class GenerationResult:
     video_path: Path
     audio_path: Path
+    tts_audio_path: Path
+    sound_audio_path: Path
     parsed_prompt: dict[str, str]
 
 
@@ -55,16 +57,21 @@ class Generator:
         processed_frames = self.scheduler.run(lambda frame: frame, frames)
         final_frames = self.renderer.interpolate_frames(processed_frames, enabled=frame_interpolation)
 
-        video_path = self.renderer.export_mp4(final_frames, output_dir / "generated_video.mp4", fps=fps)
-        audio_path = self.audio_model.synthesize(prompt, duration_seconds, output_dir / "generated_audio.wav")
+        video_path = self.renderer.export_mp4(final_frames, output_dir / "generated_video_v1.mp4", fps=fps)
+        tts_audio_path = self.audio_model.synthesize_tts(prompt, duration_seconds, output_dir / "generated_tts_v1.wav")
+        sound_audio_path = self.audio_model.synthesize_soundtrack(prompt, duration_seconds, output_dir / "generated_sound_v1.wav")
+        audio_path = self.audio_model.mix_audio(tts_audio_path, sound_audio_path, output_dir / "generated_audio_v1.wav")
         return GenerationResult(
             video_path=video_path,
             audio_path=audio_path,
+            tts_audio_path=tts_audio_path,
+            sound_audio_path=sound_audio_path,
             parsed_prompt={
                 "scene": parsed.scene,
                 "lighting": parsed.lighting,
                 "motion": parsed.motion,
                 "style": parsed.style,
                 "camera_type": parsed.camera_type,
+                "model_version": self.video_model.VERSION,
             },
         )
