@@ -4,7 +4,7 @@ Goldman AI is a modular Python application that demonstrates a **safe AI video m
 
 - Text-to-video generation
 - Image-to-video animation flow
-- Native synchronized audio generation (TTS + sound + mixed export)
+- Native synchronized audio generation (TTS + sound + mixed export) with waveform validation during mix
 - Prompt understanding parser
 - Safety filtering with blocked prompt logging
 

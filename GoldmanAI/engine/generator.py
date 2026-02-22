@@ -19,6 +19,7 @@ class GenerationResult:
     tts_audio_path: Path
     sound_audio_path: Path
     parsed_prompt: dict[str, str]
+    model_version: str
 
 
 class Generator:
@@ -61,6 +62,8 @@ class Generator:
         tts_audio_path = self.audio_model.synthesize_tts(prompt, duration_seconds, output_dir / "generated_tts_v1.wav")
         sound_audio_path = self.audio_model.synthesize_soundtrack(prompt, duration_seconds, output_dir / "generated_sound_v1.wav")
         audio_path = self.audio_model.mix_audio(tts_audio_path, sound_audio_path, output_dir / "generated_audio_v1.wav")
+
+        model_version = self.video_model.VERSION
         return GenerationResult(
             video_path=video_path,
             audio_path=audio_path,
@@ -72,6 +75,6 @@ class Generator:
                 "motion": parsed.motion,
                 "style": parsed.style,
                 "camera_type": parsed.camera_type,
-                "model_version": self.video_model.VERSION,
             },
+            model_version=model_version,
         )

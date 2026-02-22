@@ -45,19 +45,18 @@ class AudioModel:
         return output_path
 
     def mix_audio(self, tts_path: Path, sound_path: Path, output_path: Path) -> Path:
-        """Mix two mono tracks by averaging sample values and clipping safely."""
-        tts = self._read_wav(tts_path)
-        sound = self._read_wav(sound_path)
-        mixed_length = min(len(tts), len(sound))
-        mixed = array("h")
+        """Mix two mono tracks by weighted sum and clipping."""
+        tts_samples, tts_rate = self._read_wav(tts_path)
+        sound_samples, sound_rate = self._read_wav(sound_path)
 
+        if tts_rate != sound_rate:
+            raise ValueError(f"Cannot mix tracks with different sample rates: {tts_rate} vs {sound_rate}")
+
+        mixed_length = min(len(tts_samples), len(sound_samples))
+        mixed = array("h")
         for idx in range(mixed_length):
-            value = int((tts[idx] * 0.65) + (sound[idx] * 0.75))
-            if value > 32767:
-                value = 32767
-            elif value < -32768:
-                value = -32768
-            mixed.append(value)
+            value = int((tts_samples[idx] * 0.65) + (sound_samples[idx] * 0.75))
+            mixed.append(max(-32768, min(32767, value)))
 
         self._write_wav(mixed, output_path)
         return output_path
@@ -74,13 +73,17 @@ class AudioModel:
 
     def _write_wav(self, samples: array, output_path: Path) -> None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        with wave.open(str(output_path), "w") as wf:
+        with wave.open(str(output_path), "wb") as wf:
             wf.setnchannels(1)
             wf.setsampwidth(2)
             wf.setframerate(self.sample_rate)
             wf.writeframes(samples.tobytes())
 
-    def _read_wav(self, input_path: Path) -> array:
-        with wave.open(str(input_path), "r") as wf:
+    @staticmethod
+    def _read_wav(input_path: Path) -> tuple[array, int]:
+        with wave.open(str(input_path), "rb") as wf:
+            if wf.getnchannels() != 1 or wf.getsampwidth() != 2:
+                raise ValueError("Only mono 16-bit PCM WAV tracks are supported for mixing.")
+            rate = wf.getframerate()
             raw = wf.readframes(wf.getnframes())
-        return array("h", raw)
+        return array("h", raw), rate

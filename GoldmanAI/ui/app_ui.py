@@ -88,6 +88,7 @@ class GoldmanAppUI:
                     f"TTS track: {self.last_tts_audio_path}",
                     f"Sound track: {self.last_sound_audio_path}",
                     f"Parsed prompt: {result.parsed_prompt}",
+                    f"Model version: {result.model_version}",
                     f"GPU enabled: {self.pipeline.state.using_gpu}",
                 ]
             )
