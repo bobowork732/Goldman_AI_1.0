@@ -1,23 +1,89 @@
-"""Native audio synthesis model abstraction."""
+"""Native audio synthesis model abstraction with TTS + sound mixing."""
 
 from __future__ import annotations
 
+from array import array
 from pathlib import Path
+import math
 import wave
 
 
 class AudioModel:
-    """Synthesizes a simple silent WAV track for synchronized exports."""
+    """Synthesizes separate TTS and sound tracks, then mixes them into one audio file."""
+
+    def __init__(self, sample_rate: int = 22050) -> None:
+        self.sample_rate = sample_rate
+
+    def synthesize_tts(self, prompt: str, duration_seconds: int, output_path: Path) -> Path:
+        """Create a synthetic TTS-like waveform whose cadence depends on prompt length."""
+        total_samples = max(1, duration_seconds * self.sample_rate)
+        base_freq = 160 + (len(prompt) % 140)
+        volume = 4200
+        samples = array(
+            "h",
+            (
+                int(volume * math.sin(2 * math.pi * base_freq * i / self.sample_rate))
+                for i in range(total_samples)
+            ),
+        )
+        self._write_wav(samples, output_path)
+        return output_path
+
+    def synthesize_soundtrack(self, prompt: str, duration_seconds: int, output_path: Path) -> Path:
+        """Create a synthetic ambient soundtrack waveform."""
+        total_samples = max(1, duration_seconds * self.sample_rate)
+        atmosphere_freq = 70 + (sum(ord(ch) for ch in prompt) % 90)
+        volume = 2600
+        samples = array(
+            "h",
+            (
+                int(volume * math.sin(2 * math.pi * atmosphere_freq * i / self.sample_rate))
+                for i in range(total_samples)
+            ),
+        )
+        self._write_wav(samples, output_path)
+        return output_path
+
+    def mix_audio(self, tts_path: Path, sound_path: Path, output_path: Path) -> Path:
+        """Mix two mono tracks by weighted sum and clipping."""
+        tts_samples, tts_rate = self._read_wav(tts_path)
+        sound_samples, sound_rate = self._read_wav(sound_path)
+
+        if tts_rate != sound_rate:
+            raise ValueError(f"Cannot mix tracks with different sample rates: {tts_rate} vs {sound_rate}")
+
+        mixed_length = min(len(tts_samples), len(sound_samples))
+        mixed = array("h")
+        for idx in range(mixed_length):
+            value = int((tts_samples[idx] * 0.65) + (sound_samples[idx] * 0.75))
+            mixed.append(max(-32768, min(32767, value)))
+
+        self._write_wav(mixed, output_path)
+        return output_path
 
     def synthesize(self, prompt: str, duration_seconds: int, output_path: Path) -> Path:
-        sample_rate = 22050
-        nframes = duration_seconds * sample_rate
-        output_path.parent.mkdir(parents=True, exist_ok=True)
+        """Compatibility method: produce mixed output while keeping v1 API."""
+        base_dir = output_path.parent
+        tts_path = base_dir / "generated_tts_v1.wav"
+        sound_path = base_dir / "generated_sound_v1.wav"
 
-        with wave.open(str(output_path), "w") as wf:
+        self.synthesize_tts(prompt, duration_seconds, tts_path)
+        self.synthesize_soundtrack(prompt, duration_seconds, sound_path)
+        return self.mix_audio(tts_path, sound_path, output_path)
+
+    def _write_wav(self, samples: array, output_path: Path) -> None:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with wave.open(str(output_path), "wb") as wf:
             wf.setnchannels(1)
             wf.setsampwidth(2)
-            wf.setframerate(sample_rate)
-            wf.writeframes(b"\x00\x00" * nframes)
+            wf.setframerate(self.sample_rate)
+            wf.writeframes(samples.tobytes())
 
-        return output_path
+    @staticmethod
+    def _read_wav(input_path: Path) -> tuple[array, int]:
+        with wave.open(str(input_path), "rb") as wf:
+            if wf.getnchannels() != 1 or wf.getsampwidth() != 2:
+                raise ValueError("Only mono 16-bit PCM WAV tracks are supported for mixing.")
+            rate = wf.getframerate()
+            raw = wf.readframes(wf.getnframes())
+        return array("h", raw), rate

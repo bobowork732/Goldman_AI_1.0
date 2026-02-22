@@ -18,6 +18,9 @@ class GoldmanAppUI:
         self.settings = UISettings()
         self.last_video_path: str | None = None
         self.last_audio_path: str | None = None
+        self.last_video_with_audio_path: str | None = None
+        self.last_tts_audio_path: str | None = None
+        self.last_sound_audio_path: str | None = None
 
         self.root = tk.Tk()
         self.root.title("Goldman AI Video Builder")
@@ -75,13 +78,20 @@ class GoldmanAppUI:
 
         self.last_video_path = str(result.video_path)
         self.last_audio_path = str(result.audio_path)
+        self.last_video_with_audio_path = str(result.video_with_audio_path)
+        self.last_tts_audio_path = str(result.tts_audio_path)
+        self.last_sound_audio_path = str(result.sound_audio_path)
 
         self.preview_var.set(
             "\n".join(
                 [
                     f"Video: {self.last_video_path}",
-                    f"Audio: {self.last_audio_path}",
+                    f"Audio (mixed): {self.last_audio_path}",
+                    f"Video+Audio (muxed): {self.last_video_with_audio_path}",
+                    f"TTS track: {self.last_tts_audio_path}",
+                    f"Sound track: {self.last_sound_audio_path}",
                     f"Parsed prompt: {result.parsed_prompt}",
+                    f"Model version: {result.model_version}",
                     f"GPU enabled: {self.pipeline.state.using_gpu}",
                 ]
             )
@@ -93,7 +103,11 @@ class GoldmanAppUI:
             return
         messagebox.showinfo(
             "Export complete",
-            f"Video saved to: {self.last_video_path}\nAudio saved to: {self.last_audio_path}",
+            f"Video saved to: {self.last_video_path}\n"
+            f"Video+Audio saved to: {self.last_video_with_audio_path}\n"
+            f"Mixed audio saved to: {self.last_audio_path}\n"
+            f"TTS audio saved to: {self.last_tts_audio_path}\n"
+            f"Sound audio saved to: {self.last_sound_audio_path}",
         )
 
     def run(self) -> None:
